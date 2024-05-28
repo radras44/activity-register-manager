@@ -47,7 +47,7 @@ function ARInstanceInterface(props: { instance: ActivityRegisterInstance, userCo
     const sxStyles: Record<string, SxProps> = {
         "MUI-container": {
             paddingBottom: 4,
-            paddingTop: 4
+            paddingTop: 3
         },
         "container": {
             display: "flex",

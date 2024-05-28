@@ -1,3 +1,3 @@
-export function formatDate (date : Date) : string {
-    return `${date.getDate().toString().padStart(2, "0")}/${(date.getMonth() + 1).toString().padStart(2, "0")}/${date.getFullYear()}`
+export function formatDate (date : string) : string {
+    return date.split("T")[0]
 }

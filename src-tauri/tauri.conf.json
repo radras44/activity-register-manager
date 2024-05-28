@@ -3,7 +3,8 @@
     "beforeDevCommand": "npm run dev",
     "beforeBuildCommand": "npm run build",
     "devPath": "http://localhost:1420",
-    "distDir": "../dist"
+    "distDir": "../dist",
+    "withGlobalTauri" : true
   },
   "package": {
     "productName": "activity-register-manager",
@@ -11,6 +12,9 @@
   },
   "tauri": {
     "allowlist": {
+      "process" : {
+        "exit" : true
+      },
       "window" :{
         "all" : true,
         "create" : true

@@ -55,6 +55,8 @@ export default function AddContextTagInput(props: AddActivityRegisterInputProps)
         <Box sx={sxStyles["container"]}>
             <Box sx={sxStyles["input-box"]}>
                 <TextField
+                size="small"
+                autoComplete="-"
                 sx={sxStyles["input"]}
                 variant="filled"
                     label="subActividad o contexto"

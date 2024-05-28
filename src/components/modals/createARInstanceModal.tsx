@@ -8,7 +8,7 @@ import { ActivityRegisterInstance, ActivityTag, ContextTag } from "../../types/a
 import ErrorLabel from "../text/errorLabel"
 import { useState } from "react"
 import AddActivityTagInput from "../inputs/addActivityTagInput"
-import TagCount from "../text/tagCount"
+import TagCount from "../list/tagCount"
 import { useUserContext } from "../../context/userContext"
 import ModalFormSectionLabel from "../text/modalFormSectionLabel"
 
@@ -85,13 +85,21 @@ export default function CreateARInstanceModal(props: CreateRegisterProps) {
                     <Box sx={sxStyles["form"]}>
                         <Box sx={sxStyles["group-box"]}>
                             <ModalFormSectionLabel label="Ficha"/>
-                            <TextField label={"name"} {...register("name")} />
+                            <TextField 
+                            autoComplete="-"
+                            label={"name"} 
+                            {...register("name")}
+                            />
                             {errors.name && <ErrorLabel>{errors.name.message}</ErrorLabel>}
                         </Box>
                         <Box sx={sxStyles["group-box"]}>
                         <ModalFormSectionLabel label="tags de actividades"/>
                             <AddActivityTagInput onSubmit={addActivityTag} />
-                            <TagCount onTagClick={removeActivityTag} tags={activityTags} />
+                            <TagCount 
+                            onTagClick={removeActivityTag} 
+                            tags={activityTags}
+                            variant="delete"
+                             />
                         </Box>
                         <Box sx={sxStyles["submit-box"]}>
                             <Button variant="contained" type="submit">Guardar</Button>

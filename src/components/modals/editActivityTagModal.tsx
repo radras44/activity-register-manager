@@ -1,13 +1,13 @@
-import {  useState } from "react"
+import { CSSProperties, useState } from "react"
 import { ActivityTag, ContextTag } from "../../types/activityRegisterInstance"
-import { Box, Button, Modal, TextField } from "@mui/material"
+import { Box, Button, Modal, SxProps, TextField } from "@mui/material"
 import modalStyles from "./modalStyles"
 import { useForm } from "react-hook-form"
 import Joi from "joi"
 import inputStyles from "../inputs/inputStyles"
 import { joiResolver } from "@hookform/resolvers/joi"
 import ErrorLabel from "../text/errorLabel"
-import TagCount from "../text/tagCount"
+import TagCount from "../list/tagCount"
 import AddContextTagInput from "../inputs/addContextTagInput"
 
 interface EditActivityTagModalProps {
@@ -26,50 +26,83 @@ const schema = Joi.object({
 })
 
 export default function EditActivityTagModal(props: EditActivityTagModalProps) {
-    const [contextTags,setContextTags] = useState<ContextTag[]>(props.activityTag.contextTags)
+    const [contextTags, setContextTags] = useState<ContextTag[]>(props.activityTag.contextTags)
     const [activityTag] = useState<ActivityTag>(props.activityTag)
     const { register, setValue, handleSubmit, formState: { errors } } = useForm<Data>({
-        resolver : joiResolver(schema)
+        resolver: joiResolver(schema)
     })
-    function handleContextTagClick (contextTag : ContextTag | ActivityTag) {
+    const sxStyles: Record<string, SxProps> = {
+        "container": {
+            ...modalStyles["container"],
+        },
+        "form": {
+            display: "flex",
+            flexDirection: "column",
+            gap: 30
+        },
+        "form-name": {
+            display: "flex",
+            flexDirection: "column",
+            gap: 2
+        },
+        "form-activityTag": {
+            display: "flex",
+            flexDirection: "column",
+            gap: 2
+        },
+        "form-panel": {
+            display: "flex",
+            flexDirection: "row",
+            gap: 2
+        }
+    }
+    function handleContextTagClick(contextTag: ContextTag | ActivityTag) {
         setContextTags(prev => {
             const updated = prev.filter(tag => tag.id !== contextTag.id)
             return updated
         })
     }
-    function addContextTag (contextTag : ContextTag) {
-        setContextTags(prev => [...prev,contextTag])
+    function addContextTag(contextTag: ContextTag) {
+        setContextTags(prev => [...prev, contextTag])
     }
     function submit(data: Data) {
         setValue("name", "")
-        const updatedActivityTag : ActivityTag = {
+        const updatedActivityTag: ActivityTag = {
             ...props.activityTag,
-            name : data.name,
-            contextTags : contextTags
+            name: data.name,
+            contextTags: contextTags
         }
         props.onSubmit(updatedActivityTag)
         props.onClose({}, "backdropClick")
     }
     return (
         <Modal open={props.open} onClose={props.onClose}>
-            <Box sx={modalStyles["container"]}>
-                <form onSubmit={handleSubmit((data) => submit(data))}>
-                    <Box sx={inputStyles["simple-box"]}>
+            <Box sx={sxStyles["container"]}>
+                <form style={sxStyles["form"] as CSSProperties} onSubmit={handleSubmit((data) => submit(data))}>
+                    <Box sx={inputStyles["form-name"]}>
                         <TextField
+                            size="small"
+                            autoComplete="-"
                             defaultValue={activityTag.name}
                             label="Nombre"
                             {...register("name")}
                         />
                         {errors.name && <ErrorLabel>{errors.name.message}</ErrorLabel>}
                     </Box>
-                    <AddContextTagInput
-                    onSubmit={addContextTag}
-                    />
-                    <TagCount
-                    onTagClick={handleContextTagClick}
-                    tags={contextTags}
-                    />
-                    <Button type="submit">Guardar</Button>
+                    <Box sx={sxStyles["form-activityTag"]}>
+                        <AddContextTagInput
+                            onSubmit={addContextTag}
+                        />
+                        <TagCount
+                            onTagClick={handleContextTagClick}
+                            tags={contextTags}
+                            variant="delete"
+                        />
+                    </Box>
+                    <Box sx={sxStyles["form-panel"]}>
+                        <Button variant="contained" type="submit">Guardar</Button>
+                        <Button variant="outlined" onClick={() => props.onClose({}, "backdropClick")}>Cancel</Button>
+                    </Box>
                 </form>
             </Box>
         </Modal>

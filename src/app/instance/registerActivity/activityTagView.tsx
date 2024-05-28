@@ -1,7 +1,7 @@
 import { Box, Typography } from "@mui/material"
 import { useState } from "react"
 import EditActivityTagModal from "../../../components/modals/editActivityTagModal"
-import TagCount from "../../../components/text/tagCount"
+import TagCount from "../../../components/list/tagCount"
 import { UserContextReturn } from "../../../context/userContext"
 import useModal from "../../../hook/useModal"
 import { ActivityRegisterInstance, ActivityTag, ContextTag } from "../../../types/activityRegisterInstance"

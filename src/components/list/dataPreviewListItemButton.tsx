@@ -4,10 +4,9 @@ import { formatDate } from "../../utils/logic/dateUtils"
 
 interface DataPreviewListItemButtonProps {
     label: string
-    key?: React.Key
     link?: string
     otherData?: { label: string, value: string }[]
-    date?: Date
+    date?: string
     onClick?: () => void
 }
 
@@ -60,7 +59,7 @@ export default function DataPreviewListItemButton(props: DataPreviewListItemButt
     return (
         <Link to={props.link ? props.link : "#"}>
             <Card sx={sxStyles["container"]} elevation={5}>
-                <ListItemButton onClick={handleClick}  key={props.key ? props.key : undefined}>
+                <ListItemButton onClick={handleClick}>
                     <Box sx={sxStyles["profile-box"]}>
                         <Typography sx={sxStyles["label"]}>{props.label}</Typography>
                         {

@@ -1,5 +1,5 @@
 import { joiResolver } from "@hookform/resolvers/joi"
-import { Box, Button, SxProps, TextField} from "@mui/material"
+import { Box, Button, SxProps, TextField } from "@mui/material"
 import Joi from "joi"
 import { useForm } from "react-hook-form"
 import ErrorLabel from "../text/errorLabel"
@@ -16,32 +16,32 @@ const schema = Joi.object({
 
 interface AddActivityRegisterInputProps {
     onSubmit: (data: ActivityTag) => void
-    title? : string
+    title?: string
 }
 export default function AddActivityTagInput(props: AddActivityRegisterInputProps) {
-    const { register, handleSubmit, setValue,formState: { errors } } = useForm<Data>({
+    const { register, handleSubmit, setValue, formState: { errors } } = useForm<Data>({
         resolver: joiResolver(schema)
     })
 
-    const sxStyles :Record<string,SxProps> = {
-        "container" : {
-            display : "flex",
-            flexDirection :"column",
-            gap :1
+    const sxStyles: Record<string, SxProps> = {
+        "container": {
+            display: "flex",
+            flexDirection: "column",
+            gap: 1
         },
-        "input-box" : {
-            display : "flex",
-            flexDirection :"row",
-            alignItems : "center",
-            gap : 1
+        "input-box": {
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 1
         },
-        "input" : {
-            padding : 0
+        "input": {
+            padding: 0
         },
-        "input-button" : {
-            display : "block",
-            textTransform : "none",
-            fontWeight : "bold"
+        "input-button": {
+            display: "block",
+            textTransform: "none",
+            fontWeight: "bold"
         }
     }
 
@@ -51,15 +51,17 @@ export default function AddActivityTagInput(props: AddActivityRegisterInputProps
             id: v4(),
             contextTags: []
         })
-        setValue("name","")
+        setValue("name", "")
     }
 
     return (
         <Box sx={sxStyles["container"]}>
             <Box sx={sxStyles["input-box"]}>
                 <TextField
-                sx={sxStyles["input"]}
-                variant="filled"
+                    size="small"
+                    autoComplete="-"
+                    sx={sxStyles["input"]}
+                    variant="filled"
                     label="Actividad"
                     {...register("name")}
                 />

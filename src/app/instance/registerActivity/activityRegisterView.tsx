@@ -1,4 +1,4 @@
-import { Box,SxProps } from "@mui/material"
+import { Box, SxProps } from "@mui/material"
 import { UserContextReturn } from "../../../context/userContext"
 import { ActivityRegisterInstance, ActivityRegister } from "../../../types/activityRegisterInstance"
 import { formatDate } from "../../../utils/logic/dateUtils"
@@ -26,11 +26,11 @@ export default function ActivityRegisterView(props: ActivityRegisterViewProps) {
 
     function createActivityRegister() {
         const id = v4()
-        const date = new Date()
+        const date = new Date().toISOString()
         const activityRegister: ActivityRegister = {
             id: id,
             name: `Registro-${formatDate(date)}-${props.instance.registers.length + 1}`,
-            creationDate: date.toISOString(),
+            creationDate: date,
             activities: []
         }
         props.selectActivityRegister(activityRegister)
@@ -52,15 +52,22 @@ export default function ActivityRegisterView(props: ActivityRegisterViewProps) {
                 >Crear nuevo registro</TextButton>
             </Box>
             {props.instance.registers.map((register, index) => (
-                <DataPreviewListItemButton
-                key={index}
-                date={new Date(register.creationDate)}
-                label={register.name}
-                onClick={() => { props.selectActivityRegister(register) }}
-                otherData={[
-                    {label : "Tiempo total registrado",value : milisToStringedClockHour(sumActivityRegisterTimes(register))}
-                ]}
-                />
+                <Box key={index}>
+                    <DataPreviewListItemButton
+                        key={index}
+                        date={register.creationDate}
+                        label={register.name}
+                        onClick={() => { props.selectActivityRegister(register) }}
+                        otherData={[
+                            { label: "Tiempo total registrado", value: milisToStringedClockHour(sumActivityRegisterTimes(register)) },
+                        ].concat(register.activities.map(activity => {
+                            return {
+                                label : activity.tag ? activity.tag.name : "default",
+                                value : activity.time
+                            }
+                        }))}
+                    />
+                </Box>
             ))}
         </Box>
     )

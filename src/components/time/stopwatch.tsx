@@ -1,23 +1,26 @@
 import { useState, useRef, useEffect } from "react"
 import { Activity } from "../../types/activityRegisterInstance"
-import { milisToClockHour } from "../../utils/logic/timeUtils"
+import { milisToClockHour, milisToStringedClockHour } from "../../utils/logic/timeUtils"
 import { Box, IconButton, SxProps, Typography } from "@mui/material"
-import { Pause, PlayArrow, RestartAlt } from "@mui/icons-material"
+import { AccessAlarm, Pause, PlayArrow, RestartAlt } from "@mui/icons-material"
+import EditStopWatchModal from "../modals/editStopWatchModal"
+import useModal from "../../hook/useModal"
 
 interface StopwatchProps {
   startTime?: number
   activity?: {
     activity: Activity
     onPause: (activity: Activity) => void
+    stopDependency? : boolean
   }
 }
 
 export function Stopwatch(props: StopwatchProps) {
   const [time, setTime] = useState<number>(props.startTime ? props.startTime : 0)
   const [running, setRunning] = useState<boolean>(false)
-
   const requestAnimationFrameRef = useRef<number | null>(null)
   const startTime = useRef<number>(0)
+  const editStopWatch = useModal()
 
   const sxStyles: Record<string, SxProps> = {
     "container": {
@@ -25,7 +28,7 @@ export function Stopwatch(props: StopwatchProps) {
       flexDirection: "column",
       gap: 2,
       alignItems: "center",
-      maxWidth : 300
+      maxWidth: 300
     },
     "time-box": {
 
@@ -47,7 +50,7 @@ export function Stopwatch(props: StopwatchProps) {
 
   async function restart() {
     setTime(0)
-    onPuaseEmiter(true)
+    onPuaseEmiter(0)
   }
 
   function resume() {
@@ -55,20 +58,22 @@ export function Stopwatch(props: StopwatchProps) {
     requestAnimationFrameRef.current = requestAnimationFrame(checkTime)
   }
 
-  function pause() {
+  function handleEditStopWatch(time : number) {
+    setTime(time)
+    onPuaseEmiter(time)
+  }
+
+  function onPuaseEmiter(updatedTime?: number) {
     if (requestAnimationFrameRef.current) {
       cancelAnimationFrame(requestAnimationFrameRef.current)
     }
-    onPuaseEmiter()
-  }
-
-  function onPuaseEmiter (reset?:boolean) {
     if (props.activity) {
       const clockHour = milisToClockHour(time)
       const updatedActivity: Activity = {
         ...props.activity.activity,
-        timeMilis: reset ? 0 : time,
-        time: reset ? "00:00:00.0" :`${clockHour.hours}:${clockHour.minutes}:${clockHour.seconds}.${clockHour.miliseconds}`
+        timeMilis: updatedTime ? updatedTime : time,
+        time: updatedTime ? milisToStringedClockHour(updatedTime) : 
+        `${clockHour.hours}:${clockHour.minutes}:${clockHour.seconds}.${clockHour.miliseconds}`
       }
       props.activity.onPause(updatedActivity)
     }
@@ -78,9 +83,15 @@ export function Stopwatch(props: StopwatchProps) {
     if (running) {
       resume()
     } else {
-      pause()
+      onPuaseEmiter()
     }
   }, [running])
+
+  useEffect(()=>{
+    if(props.activity && props.activity.stopDependency !== undefined && props.activity.stopDependency){
+      onPuaseEmiter()
+    }
+  },[props.activity?.stopDependency])
   return (
     <Box sx={sxStyles["container"]}>
       <Box sx={sxStyles["time-box"]}>
@@ -90,13 +101,28 @@ export function Stopwatch(props: StopwatchProps) {
         <Typography sx={sxStyles["time-text"]} component={"span"}>.{Math.floor((time / 100) % 10)}</Typography>
       </Box>
       <Box sx={sxStyles["panel-box"]}>
+        <IconButton onClick={restart}><RestartAlt /></IconButton>
         {
           running ?
-            <IconButton onClick={() => setRunning(false)}><Pause /></IconButton> :
-            <IconButton onClick={() => setRunning(true)}><PlayArrow /></IconButton>
+          <IconButton onClick={() => setRunning(false)}><Pause /></IconButton> :
+          <IconButton onClick={() => setRunning(true)}><PlayArrow /></IconButton>
         }
-        <IconButton onClick={restart}><RestartAlt /></IconButton>
+        {props.activity &&
+          <IconButton onClick={()=>{editStopWatch.open()}} >
+            <AccessAlarm/>
+          </IconButton>
+        }
       </Box>
+      {
+        props.activity &&
+        <EditStopWatchModal
+          open={editStopWatch.show}
+          onClose={editStopWatch.close}
+          onSubmit={handleEditStopWatch}
+        />
+      }
     </Box>
   )
 }
+
+
