@@ -4,11 +4,11 @@ import { Box, Button, Modal, SxProps, TextField } from "@mui/material"
 import modalStyles from "./modalStyles"
 import { useForm } from "react-hook-form"
 import Joi from "joi"
-import inputStyles from "../inputs/inputStyles"
 import { joiResolver } from "@hookform/resolvers/joi"
 import ErrorLabel from "../text/errorLabel"
 import TagCount from "../list/tagCount"
 import AddContextTagInput from "../inputs/addContextTagInput"
+import ModalFormSectionLabel from "../text/modalFormSectionLabel"
 
 interface EditActivityTagModalProps {
     open: boolean
@@ -43,12 +43,12 @@ export default function EditActivityTagModal(props: EditActivityTagModalProps) {
         "form-name": {
             display: "flex",
             flexDirection: "column",
-            gap: 2
+            gap: 1
         },
         "form-activityTag": {
             display: "flex",
             flexDirection: "column",
-            gap: 2
+            gap: 1
         },
         "form-panel": {
             display: "flex",
@@ -79,17 +79,18 @@ export default function EditActivityTagModal(props: EditActivityTagModalProps) {
         <Modal open={props.open} onClose={props.onClose}>
             <Box sx={sxStyles["container"]}>
                 <form style={sxStyles["form"] as CSSProperties} onSubmit={handleSubmit((data) => submit(data))}>
-                    <Box sx={inputStyles["form-name"]}>
+                    <Box sx={sxStyles["form-name"]}>
+                        <ModalFormSectionLabel label="Nombre de la actividad" />
                         <TextField
                             size="small"
                             autoComplete="-"
                             defaultValue={activityTag.name}
-                            label="Nombre"
                             {...register("name")}
                         />
                         {errors.name && <ErrorLabel>{errors.name.message}</ErrorLabel>}
                     </Box>
                     <Box sx={sxStyles["form-activityTag"]}>
+                        <ModalFormSectionLabel label="Sub-actividades" />
                         <AddContextTagInput
                             onSubmit={addContextTag}
                         />

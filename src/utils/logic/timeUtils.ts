@@ -8,12 +8,13 @@ export interface ClockHour {
 }
 
 export function milisToClockHour(milis: number) {
-    return {
+    const obj = {
         hours: Math.floor((milis / (60000 * 60))).toString().padStart(2, "0"),
         minutes: Math.floor((milis / 60000) % 60).toString().padStart(2, "0"),
         seconds: Math.floor((milis / 1000) % 60).toString().padStart(2, "0"),
-        miliseconds: Math.floor((milis / 100) % 10)
+        miliseconds: Math.floor((milis / 100) % 10).toString()
     }
+    return obj
 }
 
 export function clockHourToMilis(clockHour: ClockHour) {

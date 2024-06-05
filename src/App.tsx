@@ -43,7 +43,7 @@ export default function App() {
               <DataPreviewListItemButton
                 label={instance.name}
                 key={index}
-                link={`/instance/registerActivity/${instance.id}`}
+                link={`/instance/${instance.id}`}
                 otherData={[
                   { label: "registros de actividad", value: instance.registers.length.toString() },
                   { label: "Tags de actividades", value: instance.activityTags.length.toString() }

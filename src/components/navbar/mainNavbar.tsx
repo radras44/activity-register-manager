@@ -13,12 +13,17 @@ interface AditionalElement {
 interface MainNavbarProps {
     additionalElements?: AditionalElement[]
     onBack?: () => void
+    onNavigation? : () => void
 }
 
 export default function MainNavbar(props: MainNavbarProps) {
     const sxStyles: Record<string, SxProps> = {
         "toolbar": {
             width: "100%",
+            display : "flex",
+            flexDirection : "row",
+            alignItems : "center",
+            padding : 0
         },
         "toolbar-right": {
             display: "flex",
@@ -46,8 +51,7 @@ export default function MainNavbar(props: MainNavbarProps) {
 
     }
     return (
-        <Box>
-            <AppBar position="sticky">
+            <AppBar elevation={0} position="sticky" sx={sxStyles["appBar"]}>
                 <Toolbar sx={sxStyles["toolbar"]}>
                     <Box sx={sxStyles["toolbar-left"]}>
                         {
@@ -60,7 +64,12 @@ export default function MainNavbar(props: MainNavbarProps) {
                             props.additionalElements &&
                             <>
                                 {props.additionalElements.map((el, index) => (
-                                    <IconButton key={index} onClick={el.onClick}>
+                                    <IconButton key={index} onClick={()=>{
+                                        el.onClick()
+                                        if(props.onNavigation){
+                                            props.onNavigation()
+                                        }
+                                    }}>
                                         {el.icon}
                                     </IconButton>
                                 ))}
@@ -68,11 +77,12 @@ export default function MainNavbar(props: MainNavbarProps) {
                         }
                     </Box>
                     <Box sx={sxStyles["toolbar-right"]}>
-                        <MainNavbarDrawer sxStyles={sxStyles} />
+                        <MainNavbarDrawer 
+                        onNavigation={props.onNavigation ? props.onNavigation : () => {}} 
+                        sxStyles={sxStyles} />
                     </Box>
                 </Toolbar>
             </AppBar>
-        </Box>
     )
 }
 
@@ -80,7 +90,7 @@ const drawerLinks: DrawerLink[] = [
     { label: "Inicio", link: "/", icon: <Home /> }
 ]
 
-function MainNavbarDrawer({ sxStyles }: { sxStyles: Record<string, SxProps> }) {
+function MainNavbarDrawer({ sxStyles,onNavigation }: { sxStyles: Record<string, SxProps>,onNavigation : () => void}) {
     const drawer = useDrawer()
     return (
         <>
@@ -94,7 +104,7 @@ function MainNavbarDrawer({ sxStyles }: { sxStyles: Record<string, SxProps> }) {
                 <Box sx={sxStyles["drawer"]}>
                     <List>
                         {drawerLinks.map((drawerLink, index) => (
-                            <Link key={index} to={drawerLink.link}>
+                            <Link key={index} to={drawerLink.link} onClick={onNavigation}>
                                 <ListItemButton sx={sxStyles["drawer-list-button"]}>
                                     {drawerLink.icon}
                                     {drawerLink.label}

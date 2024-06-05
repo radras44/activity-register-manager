@@ -7,7 +7,8 @@ interface ModalFormSectionLabelProps {
 export default function ModalFormSectionLabel (props : ModalFormSectionLabelProps) {
     const sxStyles : Record<string,SxProps>= {
         "container" : {
-            borderBottom : `1px solid ${styleTheme.palette.text.disabled}`
+            borderBottom : `1px solid ${styleTheme.palette.text.disabled}`,
+            width : "100%"
         },
         "label" : {
             marginLeft : 1,

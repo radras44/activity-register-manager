@@ -11,7 +11,8 @@ export default {
         maxHeight : "90%",
         maxWidth : "90%",
         boxShadow: 24,
-        p: 4,
-        overflow : "auto"
+        overflow : "auto",
+        padding : 4,
+        minWidth : 350
     }
 } as Record<string,SxProps>

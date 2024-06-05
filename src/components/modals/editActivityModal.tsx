@@ -6,6 +6,8 @@ import TagCount from "../list/tagCount"
 import AnnotationCount from "../list/annotationCount"
 import AddAnnotationInput from "../inputs/addAnnotationInput"
 import ModalFormSectionLabel from "../text/modalFormSectionLabel"
+import useModal from "../../hook/useModal"
+import EditAnnotationModal from "./editAnnotationModal"
 
 interface EditActivityModalProps {
     open: boolean
@@ -17,6 +19,8 @@ interface EditActivityModalProps {
 
 export default function EditActivityModal(props: EditActivityModalProps) {
     const [activity, setActivity] = useState<Activity>(props.activity)
+    const [selectedAnnotation,setSelectedAnnotation] = useState<string|null>(null)
+    const editAnnotation = useModal()
 
     const sxStyles: Record<string, SxProps> = {
         "container": {
@@ -49,7 +53,9 @@ export default function EditActivityModal(props: EditActivityModalProps) {
 
     function changeActivityTag(e: SelectChangeEvent) {
         const newActivityTag: ActivityTag | null = props.instance.activityTags.find(tag => tag.id === e.target.value) || null
-        setActivity(prev => ({ ...prev, tag: newActivityTag }))
+        setActivity(prev => {
+            return { ...prev, tag: newActivityTag,contextTags : []}
+        })
     }
 
     function handleContextTagClick(contextTag: ContextTag) {
@@ -79,6 +85,21 @@ export default function EditActivityModal(props: EditActivityModalProps) {
         props.onSubmit(activity)
         props.onClose({}, "backdropClick")
     }
+
+    function handleEditAnnotationClick (annotation : string) {
+        setSelectedAnnotation(annotation)
+        editAnnotation.open()
+    }
+
+    function handleEditAnnotationSubmit (annotation : string) {
+        setActivity(prev => {
+            const updatedAnnotations : string[] = [...prev.anotations]
+            const index = updatedAnnotations.findIndex(el => el === selectedAnnotation)
+            updatedAnnotations[index] = annotation
+            return {...prev,anotations : updatedAnnotations}
+        })
+    }
+
     return (
         <Modal open={props.open} onClose={props.onClose}>
             <Box sx={sxStyles["container"]}>
@@ -98,7 +119,7 @@ export default function EditActivityModal(props: EditActivityModalProps) {
                     </Select>
                 </Box>
                 <Box sx={sxStyles["contextTags"]}>
-                    <ModalFormSectionLabel label="Tags adicionales" />
+                    <ModalFormSectionLabel label="Sub-actividades" />
                     <TagCount
                         tags={activity.tag ? activity.tag.contextTags : []}
                         onTagClick={handleContextTagClick}
@@ -113,12 +134,22 @@ export default function EditActivityModal(props: EditActivityModalProps) {
                     <AnnotationCount
                         annotations={activity.anotations}
                         handleDelete={removeAnnotation}
+                        handleEdit={handleEditAnnotationClick}
                     />
                 </Box>
                 <Box sx={sxStyles["panel"]}>
                     <Button variant="contained" onClick={handleSubmit}>Guardar</Button>
                     <Button variant="outlined" onClick={() => props.onClose({}, "backdropClick")}>Cancelar</Button>
                 </Box>
+                {
+                    (selectedAnnotation && editAnnotation.show) &&
+                    <EditAnnotationModal
+                    open={editAnnotation.show}
+                    onClose={editAnnotation.close}
+                    onSubmit={handleEditAnnotationSubmit}
+                    annotation={selectedAnnotation}
+                    />
+                }
             </Box>
         </Modal>
     )

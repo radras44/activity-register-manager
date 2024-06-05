@@ -61,8 +61,8 @@ export default function AddActivityTagInput(props: AddActivityRegisterInputProps
                     size="small"
                     autoComplete="-"
                     sx={sxStyles["input"]}
-                    variant="filled"
-                    label="Actividad"
+                    variant="outlined"
+                    placeholder="Agregar actividad"
                     {...register("name")}
                 />
                 <Button sx={sxStyles["input-button"]} onClick={handleSubmit((data) => handleEmit(data))}>Añadir</Button>

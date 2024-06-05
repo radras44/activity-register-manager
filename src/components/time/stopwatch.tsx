@@ -1,6 +1,4 @@
-import { useState, useRef, useEffect } from "react"
-import { Activity } from "../../types/activityRegisterInstance"
-import { milisToClockHour, milisToStringedClockHour } from "../../utils/logic/timeUtils"
+import { useState, useRef, useEffect, forwardRef, useImperativeHandle, Ref } from "react"
 import { Box, IconButton, SxProps, Typography } from "@mui/material"
 import { AccessAlarm, Pause, PlayArrow, RestartAlt } from "@mui/icons-material"
 import EditStopWatchModal from "../modals/editStopWatchModal"
@@ -8,19 +6,26 @@ import useModal from "../../hook/useModal"
 
 interface StopwatchProps {
   startTime?: number
-  activity?: {
-    activity: Activity
-    onPause: (activity: Activity) => void
-    stopDependency? : boolean
-  }
 }
 
-export function Stopwatch(props: StopwatchProps) {
+export interface StopwatchRef {
+  getCurrentTime: () => number
+  stop : () => void
+}
+
+export const Stopwatch = forwardRef<StopwatchRef, StopwatchProps>((props, ref) => {
   const [time, setTime] = useState<number>(props.startTime ? props.startTime : 0)
   const [running, setRunning] = useState<boolean>(false)
   const requestAnimationFrameRef = useRef<number | null>(null)
   const startTime = useRef<number>(0)
   const editStopWatch = useModal()
+
+  useImperativeHandle(ref as Ref<StopwatchRef>, () => {
+    return {
+      getCurrentTime: () => time,
+      stop : () => setRunning(false)
+    }
+  }, [time])
 
   const sxStyles: Record<string, SxProps> = {
     "container": {
@@ -50,7 +55,7 @@ export function Stopwatch(props: StopwatchProps) {
 
   async function restart() {
     setTime(0)
-    onPuaseEmiter(0)
+    pauseEmiter()
   }
 
   function resume() {
@@ -58,40 +63,26 @@ export function Stopwatch(props: StopwatchProps) {
     requestAnimationFrameRef.current = requestAnimationFrame(checkTime)
   }
 
-  function handleEditStopWatch(time : number) {
-    setTime(time)
-    onPuaseEmiter(time)
-  }
-
-  function onPuaseEmiter(updatedTime?: number) {
+  function pauseEmiter() {
     if (requestAnimationFrameRef.current) {
       cancelAnimationFrame(requestAnimationFrameRef.current)
     }
-    if (props.activity) {
-      const clockHour = milisToClockHour(time)
-      const updatedActivity: Activity = {
-        ...props.activity.activity,
-        timeMilis: updatedTime ? updatedTime : time,
-        time: updatedTime ? milisToStringedClockHour(updatedTime) : 
-        `${clockHour.hours}:${clockHour.minutes}:${clockHour.seconds}.${clockHour.miliseconds}`
-      }
-      props.activity.onPause(updatedActivity)
-    }
+  }
+
+  //modal submit handlers
+  function handleEditStopWatch(time: number) {
+    setTime(time)
+    pauseEmiter()
   }
 
   useEffect(() => {
     if (running) {
       resume()
     } else {
-      onPuaseEmiter()
+      pauseEmiter()
     }
   }, [running])
 
-  useEffect(()=>{
-    if(props.activity && props.activity.stopDependency !== undefined && props.activity.stopDependency){
-      onPuaseEmiter()
-    }
-  },[props.activity?.stopDependency])
   return (
     <Box sx={sxStyles["container"]}>
       <Box sx={sxStyles["time-box"]}>
@@ -104,25 +95,24 @@ export function Stopwatch(props: StopwatchProps) {
         <IconButton onClick={restart}><RestartAlt /></IconButton>
         {
           running ?
-          <IconButton onClick={() => setRunning(false)}><Pause /></IconButton> :
-          <IconButton onClick={() => setRunning(true)}><PlayArrow /></IconButton>
+            <IconButton onClick={() => setRunning(false)}><Pause /></IconButton> :
+            <IconButton onClick={() => setRunning(true)}><PlayArrow /></IconButton>
         }
-        {props.activity &&
-          <IconButton onClick={()=>{editStopWatch.open()}} >
-            <AccessAlarm/>
-          </IconButton>
-        }
+
+        <IconButton onClick={() => { editStopWatch.open() }} >
+          <AccessAlarm />
+        </IconButton>
       </Box>
       {
-        props.activity &&
+        editStopWatch.show &&
         <EditStopWatchModal
           open={editStopWatch.show}
           onClose={editStopWatch.close}
           onSubmit={handleEditStopWatch}
+          defaultTime={time}
         />
       }
     </Box>
   )
 }
-
-
+)

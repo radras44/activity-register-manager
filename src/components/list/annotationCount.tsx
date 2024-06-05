@@ -1,9 +1,10 @@
-import { Delete } from "@mui/icons-material";
+import { Delete, Edit } from "@mui/icons-material";
 import { Box, IconButton, SxProps, Typography } from "@mui/material";
 
 interface AnnotationCountProps {
-    handleDelete: (annotation: string) => void
+    handleDelete?: (annotation: string) => void
     annotations: string[]
+    handleEdit?: (annotation: string) => void
 }
 
 export default function AnnotationCount(props: AnnotationCountProps) {
@@ -20,21 +21,28 @@ export default function AnnotationCount(props: AnnotationCountProps) {
         "list-item": {
             display: "flex",
             flexDirection: "column",
-            alignItems : "flex-end",
+            alignItems: "flex-end",
             backgroundColor: "grey.200"
         },
         "list-item-text": {
             lineHeight: 1.5,
             wordBreak: "break-all",
             whiteSpace: "pre-wrap",
-            padding : 1,
-            width : "100%"
+            padding: 1,
+            width: "100%",
+            minHeight : 50,
+            fontWeight : 600
         },
-        "list-item-panel" : {
+        "list-item-panel": {
             display: "flex",
             flexDirection: "row",
-            justifyContent : "flex-end",
-            gap : 1
+            justifyContent: "flex-end",
+            backgroundColor: "grey.600",
+            width: "100%",
+            paddingRight: 1,
+        },
+        "list-item-panel-icon": {
+            color: "primary.contrastText",
         }
     }
     return (
@@ -42,16 +50,33 @@ export default function AnnotationCount(props: AnnotationCountProps) {
             {
                 props.annotations.map((annotation, index) => (
                     <Box sx={sxStyles["list-item"]} key={index}>
+                        <Box sx={sxStyles["list-item-panel"]}>
+                            {
+                                props.handleDelete &&
+                                <IconButton sx={sxStyles["list-item-panel-icon"]} onClick={() => {
+                                    if (props.handleDelete) {
+                                        props.handleDelete(annotation)
+                                    }
+                                }}>
+                                    <Delete />
+                                </IconButton>
+                            }
+                            {
+                                props.handleEdit &&
+                                <IconButton sx={sxStyles["list-item-panel-icon"]} onClick={() => {
+                                    if (props.handleEdit) {
+                                        props.handleEdit(annotation)
+                                    }
+                                }}>
+                                    <Edit />
+                                </IconButton>
+                            }
+                        </Box>
                         <Typography
                             sx={sxStyles["list-item-text"]}
                             component={"p"}
                             variant="caption"
                         >{annotation}</Typography>
-                        <Box sx={sxStyles["list-item-panel"]}>
-                            <IconButton color="error" sx={sxStyles["delete-button"]} onClick={() => { props.handleDelete(annotation) }}>
-                                <Delete />
-                            </IconButton>
-                        </Box>
                     </Box>
                 ))
             }

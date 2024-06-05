@@ -13,7 +13,7 @@ interface Data {
 }
 
 const schema = Joi.object({
-    annotation: Joi.string().min(1).max(360).required()
+    annotation: Joi.string().min(1).max(1000).required()
 })
 
 
@@ -53,8 +53,8 @@ export default function AddAnnotationInput(props : AddAnnotationInputProps) {
             size="small"
             autoComplete="-"
             sx={sxStyles["input"]}
-            variant="filled"
-                label="nueva anotación"
+            variant="outlined"
+            placeholder="Añadir nota"
                 {...register("annotation")}
             />
             <Button sx={sxStyles["input-button"]} onClick={handleSubmit((data) => handleEmit(data))}>Añadir</Button>

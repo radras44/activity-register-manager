@@ -5,7 +5,7 @@ import { Cancel } from "@mui/icons-material";
 
 interface TagCountProps {
     tags: ActivityTag[] | ContextTag[]
-    onTagClick: (tag: ActivityTag | ContextTag) => void
+    onTagClick?: (tag: ActivityTag | ContextTag) => void
     highlight?: ActivityTag[] | ContextTag[]
     variant?: "delete" | "add"
 }
@@ -23,7 +23,9 @@ export default function TagCount(props: TagCountProps) {
             display: "flex",
             flexDirection: "row",
             flexWrap: "wrap",
-            gap: 1
+            gap: 1,
+            overflowY: "auto",
+            maxHeight: 200
         },
         "tag-button": {
             border: "none"
@@ -47,13 +49,13 @@ export default function TagCount(props: TagCountProps) {
         "deleteBox": {
             display: "flex",
             flexDirection: "row",
-            alignItems : "center",
-            backgroundColor : "gray.300"
+            alignItems: "center",
+            backgroundColor: "gray.300"
         },
-        "deleteBox-icon" : {
-            width : 20,
-            height : "auto",
-            color : "grey.600"
+        "deleteBox-icon": {
+            width: 20,
+            height: "auto",
+            color: "grey.600"
         }
     }
     return (
@@ -61,11 +63,12 @@ export default function TagCount(props: TagCountProps) {
             {props.tags.map((tag, index) => (
                 variant === "add" ?
                     <Button
+                        disabled={props.onTagClick ? undefined : true}
                         key={index}
                         color="success"
                         variant={highLightIds.includes(tag.id) ? "contained" : "outlined"}
                         sx={highLightIds.includes(tag.id) ? sxStyles["tag-button-highligh"] : sxStyles["tag-button"]}
-                        onClick={() => props.onTagClick(tag)}>
+                        onClick={() => props.onTagClick && props.onTagClick(tag)}>
                         <Typography
                             key={index}
                             sx={highLightIds.includes(tag.id) ? sxStyles["tag-text-highlight"] : sxStyles["tag-text"]}
@@ -74,16 +77,18 @@ export default function TagCount(props: TagCountProps) {
                         >{tag.name}</Typography>
                     </Button>
                     :
-                    <Box sx={sxStyles["deleteBox"]}>
+                    <Box
+                        key={index}
+                        sx={sxStyles["deleteBox"]}>
                         <Typography
-                            key={index}
                             sx={highLightIds.includes(tag.id) ? sxStyles["tag-text-highlight"] : sxStyles["tag-text"]}
                             variant="subtitle1"
                             component="span"
                         >{tag.name}</Typography>
                         <IconButton
+                            disabled={props.onTagClick ? undefined : true}
                             color="error"
-                            onClick={() => props.onTagClick(tag)}>
+                            onClick={() => props.onTagClick && props.onTagClick(tag)}>
                             <Cancel sx={sxStyles["deleteBox-icon"]} />
                         </IconButton>
                     </Box>

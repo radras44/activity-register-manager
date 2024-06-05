@@ -3,7 +3,7 @@ import modalStyles from "./modalStyles";
 import Joi from "joi";
 import { useForm } from "react-hook-form";
 import { joiResolver } from "@hookform/resolvers/joi";
-import { clockHourToMilis } from "../../utils/logic/timeUtils";
+import { clockHourToMilis, milisToClockHour } from "../../utils/logic/timeUtils";
 import { CSSProperties } from "react";
 import { styleTheme } from "../../main";
 import ErrorLabel from "../text/errorLabel";
@@ -12,6 +12,7 @@ interface editStopWatchModalProps {
     open: boolean
     onClose: ((event: {}, reason: "backdropClick" | "escapeKeyDown") => void)
     onSubmit: (time: number) => void
+    defaultTime : number
 }
 
 interface Data {
@@ -29,13 +30,15 @@ const schema = Joi.object({
 })
 
 export default function EditStopWatchModal(props: editStopWatchModalProps) {
+    const defaultTime = milisToClockHour(props.defaultTime)
+   
     const { handleSubmit, setValue, register, getValues, formState: { errors } } = useForm<Data>({
         resolver: joiResolver(schema),
         defaultValues: {
-            hours: "00",
-            minutes: "00",
-            seconds: "00",
-            miliSeconds: "0"
+            hours: defaultTime.hours,
+            minutes: defaultTime.minutes,
+            seconds: defaultTime.seconds,
+            miliSeconds: defaultTime.miliseconds
         }
     })
     const sxStyles: Record<string, SxProps> = {
@@ -48,7 +51,7 @@ export default function EditStopWatchModal(props: editStopWatchModalProps) {
         "form": {
             display: "flex",
             flexDirection: "column",
-            gap: 2
+            gap: 30
         },
         "form-body": {
             display: "flex",

@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { joiResolver } from "@hookform/resolvers/joi";
 import Joi from "joi";
 import ErrorLabel from "../text/errorLabel";
+import ModalFormSectionLabel from "../text/modalFormSectionLabel";
 interface EditActivityRegisterModalProps {
     activityRegister: ActivityRegister
     open: boolean
@@ -24,7 +25,7 @@ const schema = Joi.object({
 })
 
 export default function EditActivityRegisterModal(props: EditActivityRegisterModalProps) {
-    console.log("props: creationDate",props.activityRegister)
+    console.log("props: creationDate", props.activityRegister)
     const defaultDate = props.activityRegister.creationDate.split("T")[0]
     const { register, formState: { errors }, handleSubmit } = useForm<Data>({
         resolver: joiResolver(schema),
@@ -43,6 +44,16 @@ export default function EditActivityRegisterModal(props: EditActivityRegisterMod
             display: "flex",
             flexDirection: "column",
             gap: 2
+        },
+        "form-field": {
+            display: "flex",
+            flexDirection: "column",
+            gap: 1
+        },
+        "form-panel": {
+            display: "flex",
+            flexDirection: "row",
+            gap: 1
         }
     }
 
@@ -52,22 +63,23 @@ export default function EditActivityRegisterModal(props: EditActivityRegisterMod
             creationDate: data.date.toISOString(),
             name: data.name.trim()
         })
-        props.onClose({},"backdropClick")
+        props.onClose({}, "backdropClick")
     }
     return (
         <Modal open={props.open} onClose={props.onClose}>
             <Box sx={sxStyles["container"]}>
                 <form onSubmit={handleSubmit((data) => submit(data))} style={sxStyles["form"] as CSSProperties}>
                     <Box sx={sxStyles["form-fields"]}>
-                        <Box>
+                        <Box sx={sxStyles["form-field"]}>
+                            <ModalFormSectionLabel label="Nombre" />
                             <TextField
                                 {...register("name")}
-                                label={"Nombre"}
                                 defaultValue={props.activityRegister.name}
                             />
                             {errors.name && <ErrorLabel>{errors.name.message}</ErrorLabel>}
                         </Box>
-                        <Box>
+                        <Box sx={sxStyles["form-field"]}>
+                            <ModalFormSectionLabel label="Fecha" />
                             <Input
                                 {...register("date")}
                                 defaultValue={defaultDate}

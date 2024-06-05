@@ -3,8 +3,9 @@ import App from "./App";
 import "./styles.css";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { UserProvider } from "./context/userContext";
-import ActivityRegisterInstanceScreen from "./app/instance/registerActivity/activityRegisterInstanceScreen";
+import ActivityRegisterInstanceScreen from "./app/activityRegisterInstance/activityRegisterInstanceScreen";
 import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
+import ActivityRegisterEditor from "./app/activityRegisterInstance/views/activityRegister/activityRegisterEditor";
 
 export const darkTheme = createTheme({
   palette: {
@@ -25,8 +26,12 @@ const router = createBrowserRouter([
     element: <App />
   },
   {
-    path: "/instance/registerActivity/:id",
+    path: "/instance/:id",
     element: <ActivityRegisterInstanceScreen />
+  },
+  {
+    path : "/instance/activityRegister/:instanceId/:registerId",
+    element : <ActivityRegisterEditor/>
   }
 ])
 

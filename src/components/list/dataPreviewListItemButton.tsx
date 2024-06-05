@@ -18,11 +18,14 @@ export default function DataPreviewListItemButton(props: DataPreviewListItemButt
     }
     const sxStyles: Record<string, SxProps> = {
         "container": {
+            maxWidth : 650
+        },
+        "button" : {
             display: "flex",
             flexDirection: "row",
-            alignItems: "flex-start",
+            justifyContent : "space-between",
+            alignItems : "flex-start",
             gap: 2,
-            maxWidth : 650
         },
         "label": {
             fontWeight: "bold",
@@ -42,10 +45,9 @@ export default function DataPreviewListItemButton(props: DataPreviewListItemButt
         "profile-box": {
             display: "flex",
             flexDirection: "column",
-            gap: 1
+            gap: 1,
         },
         "date-box": {
-            flex: 1,
             alignItems: "flex-end",
             display: "flex",
             flexDirection: "column",
@@ -59,7 +61,7 @@ export default function DataPreviewListItemButton(props: DataPreviewListItemButt
     return (
         <Link to={props.link ? props.link : "#"}>
             <Card sx={sxStyles["container"]} elevation={5}>
-                <ListItemButton onClick={handleClick}>
+                <ListItemButton sx={sxStyles["button"]} onClick={handleClick}>
                     <Box sx={sxStyles["profile-box"]}>
                         <Typography sx={sxStyles["label"]}>{props.label}</Typography>
                         {

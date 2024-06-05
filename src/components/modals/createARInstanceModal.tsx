@@ -84,10 +84,10 @@ export default function CreateARInstanceModal(props: CreateRegisterProps) {
                 >
                     <Box sx={sxStyles["form"]}>
                         <Box sx={sxStyles["group-box"]}>
-                            <ModalFormSectionLabel label="Ficha"/>
+                            <ModalFormSectionLabel label="Nombre de la instancia"/>
                             <TextField 
                             autoComplete="-"
-                            label={"name"} 
+                            size="small"
                             {...register("name")}
                             />
                             {errors.name && <ErrorLabel>{errors.name.message}</ErrorLabel>}
