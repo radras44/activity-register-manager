@@ -142,8 +142,6 @@ export default function ActivityRegisterEditor() {
         }
     }
 
-
-
     //fs functions
     function saveActivityRegister(registerToUpdate?: ActivityRegister) {
         if (!instance || !activityRegister) return null

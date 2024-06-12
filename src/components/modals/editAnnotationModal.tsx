@@ -1,6 +1,5 @@
-import { Box, Button, Card, Modal, SxProps, TextField } from "@mui/material"
+import { Box, Button, Card, Modal, SxProps, TextareaAutosize } from "@mui/material"
 import modalStyles from "./modalStyles"
-import ModalFormSectionLabel from "../text/modalFormSectionLabel"
 import { useForm } from "react-hook-form"
 import Joi from "joi"
 import { joiResolver } from "@hookform/resolvers/joi"
@@ -9,49 +8,57 @@ import { CSSProperties } from "react"
 interface EditAnnotationModalProps {
     open: boolean
     onClose: ((event: {}, reason: "backdropClick" | "escapeKeyDown") => void)
-    annotation : string
-    onSubmit: (annotation : string) => void
+    annotation: string
+    onSubmit: (annotation: string) => void
 }
 
 interface Data {
-    annotation : string
+    annotation: string
 }
 
 const schema = Joi.object({
-    annotation : Joi.string().min(1).max(1000).required()
+    annotation: Joi.string().min(1).max(1000).required()
 })
 
-export default function EditAnnotationModal (props : EditAnnotationModalProps) {
-    const {register,handleSubmit,formState : {errors}} = useForm<Data>({
-        resolver : joiResolver(schema),
-        defaultValues : {
-            annotation : props.annotation
+export default function EditAnnotationModal(props: EditAnnotationModalProps) {
+    const { register, handleSubmit, formState: { errors } } = useForm<Data>({
+        resolver: joiResolver(schema),
+        defaultValues: {
+            annotation: props.annotation
         }
     })
     const sxStyles: Record<string, SxProps> = {
         "container": {
             ...modalStyles["container"],
+            minWidth: 600
         },
         "form": {
             display: "flex",
             flexDirection: "column",
             gap: 30
         },
+        "textArea": {
+            resize: "none",
+            maxHeight: 150,
+            overflowY: "auto",
+            padding: 10,
+        },
         "form-panel": {
             display: "flex",
             flexDirection: "row",
             gap: 1
         },
-        "form-textField" : {
-            display : "flex",
-            flexDirection  :"column",
-            gap : 1
+        "form-textField": {
+            display: "flex",
+            flexDirection: "column",
+            gap: 1,
+            flexWrap: "wrap"
         }
     }
 
-    function submit (data : Data) {
+    function submit(data: Data) {
         props.onSubmit(data.annotation)
-        props.onClose({},"backdropClick")
+        props.onClose({}, "backdropClick")
     }
 
     return (
@@ -59,9 +66,11 @@ export default function EditAnnotationModal (props : EditAnnotationModalProps) {
             <Card sx={sxStyles["container"]}>
                 <form style={sxStyles["form"] as CSSProperties} onSubmit={handleSubmit((data) => submit(data))}>
                     <Box sx={sxStyles["form-textField"]}>
-                        <ModalFormSectionLabel label="Anotación"/>
-                        <TextField
-                        {...register("annotation")}
+                        <TextareaAutosize
+                            style={sxStyles["textArea"] as CSSProperties}
+                            autoComplete="-"
+                            maxRows={4}
+                            {...register("annotation")}
                         />
                         {errors.annotation && <ErrorLabel>{errors.annotation.message}</ErrorLabel>}
                     </Box>

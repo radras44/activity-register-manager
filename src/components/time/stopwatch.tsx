@@ -55,7 +55,7 @@ export const Stopwatch = forwardRef<StopwatchRef, StopwatchProps>((props, ref) =
 
   async function restart() {
     setTime(0)
-    pauseEmiter()
+    setRunning(false)
   }
 
   function resume() {
@@ -72,7 +72,7 @@ export const Stopwatch = forwardRef<StopwatchRef, StopwatchProps>((props, ref) =
   //modal submit handlers
   function handleEditStopWatch(time: number) {
     setTime(time)
-    pauseEmiter()
+    setRunning(false)
   }
 
   useEffect(() => {

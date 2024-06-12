@@ -39,7 +39,7 @@ export default function ActivityRegisterView(props: ActivityRegisterViewProps) {
         const date = new Date().toISOString()
         const activityRegister: ActivityRegister = {
             id: id,
-            name: `Registro-${formatDate(date)}-${props.instance.registers.length + 1}`,
+            name: `${formatDate(date)}-_${id.substring(0,6)}...`,
             creationDate: date,
             activities: []
         }

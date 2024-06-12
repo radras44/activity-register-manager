@@ -88,7 +88,6 @@ export default function EditStopWatchModal(props: editStopWatchModalProps) {
     }
 
     function submit(data: Data) {
-        console.log(data)
         const timeInMilis: number = clockHourToMilis({
             hours: parseInt(data.hours),
             minutes: parseInt(data.minutes),

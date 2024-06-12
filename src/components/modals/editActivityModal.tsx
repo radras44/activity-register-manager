@@ -121,6 +121,7 @@ export default function EditActivityModal(props: EditActivityModalProps) {
                 <Box sx={sxStyles["contextTags"]}>
                     <ModalFormSectionLabel label="Sub-actividades" />
                     <TagCount
+                    search
                         tags={activity.tag ? activity.tag.contextTags : []}
                         onTagClick={handleContextTagClick}
                         highlight={activity.contextTags}

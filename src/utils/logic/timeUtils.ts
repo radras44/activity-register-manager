@@ -21,7 +21,7 @@ export function clockHourToMilis(clockHour: ClockHour) {
     return (clockHour.hours * 1000 * 60 * 60) +
         (clockHour.minutes * 1000 * 60) +
         (clockHour.seconds * 1000) +
-        clockHour.miliSeconds
+        clockHour.miliSeconds * 100
 }
 export function milisToStringedClockHour(milis: number) {
     const time = milisToClockHour(milis)

@@ -9,12 +9,16 @@ import ErrorLabel from "../text/errorLabel"
 import TagCount from "../list/tagCount"
 import AddContextTagInput from "../inputs/addContextTagInput"
 import ModalFormSectionLabel from "../text/modalFormSectionLabel"
+import DeleteModal from "./deleteModal"
+import useModal from "../../hook/useModal"
+import TextButton from "../button/textButton"
+import { Delete } from "@mui/icons-material"
 
 interface EditActivityTagModalProps {
     open: boolean
     onClose: ((event: {}, reason: "backdropClick" | "escapeKeyDown") => void)
     activityTag: ActivityTag
-    onSubmit: (activityTag: ActivityTag) => void
+    onSubmit: (activityTag: ActivityTag, deleteRequest: boolean) => void
 }
 
 interface Data {
@@ -26,6 +30,7 @@ const schema = Joi.object({
 })
 
 export default function EditActivityTagModal(props: EditActivityTagModalProps) {
+    const deleteActivityTag = useModal()
     const [contextTags, setContextTags] = useState<ContextTag[]>(props.activityTag.contextTags)
     const [activityTag] = useState<ActivityTag>(props.activityTag)
     const { register, setValue, handleSubmit, formState: { errors } } = useForm<Data>({
@@ -54,6 +59,11 @@ export default function EditActivityTagModal(props: EditActivityTagModalProps) {
             display: "flex",
             flexDirection: "row",
             gap: 2
+        },
+        "options": {
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "flex-start"
         }
     }
     function handleContextTagClick(contextTag: ContextTag | ActivityTag) {
@@ -72,7 +82,12 @@ export default function EditActivityTagModal(props: EditActivityTagModalProps) {
             name: data.name,
             contextTags: contextTags
         }
-        props.onSubmit(updatedActivityTag)
+        props.onSubmit(updatedActivityTag, false)
+        props.onClose({}, "backdropClick")
+    }
+
+    function handleDelete() {
+        props.onSubmit(activityTag, true)
         props.onClose({}, "backdropClick")
     }
     return (
@@ -95,16 +110,33 @@ export default function EditActivityTagModal(props: EditActivityTagModalProps) {
                             onSubmit={addContextTag}
                         />
                         <TagCount
+                            search={true}
                             onTagClick={handleContextTagClick}
                             tags={contextTags}
                             variant="delete"
                         />
+                    </Box>
+                    <Box sx={sxStyles["options"]}>
+                        <TextButton
+                            color="error"
+                            startIcon={<Delete />}
+                            onClick={deleteActivityTag.open}
+                        >Eliminar actividad</TextButton>
                     </Box>
                     <Box sx={sxStyles["form-panel"]}>
                         <Button variant="contained" type="submit">Guardar</Button>
                         <Button variant="outlined" onClick={() => props.onClose({}, "backdropClick")}>Cancel</Button>
                     </Box>
                 </form>
+                {
+                    deleteActivityTag.show &&
+                    <DeleteModal
+                        open={deleteActivityTag.show}
+                        onClose={deleteActivityTag.close}
+                        description="¿Estas seguro de que quieres eliminar esta actividad?"
+                        onSubmit={handleDelete}
+                    />
+                }
             </Box>
         </Modal>
     )
