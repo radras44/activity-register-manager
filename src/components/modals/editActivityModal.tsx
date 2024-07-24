@@ -19,7 +19,7 @@ interface EditActivityModalProps {
 
 export default function EditActivityModal(props: EditActivityModalProps) {
     const [activity, setActivity] = useState<Activity>(props.activity)
-    const [selectedAnnotation,setSelectedAnnotation] = useState<string|null>(null)
+    const [selectedAnnotation, setSelectedAnnotation] = useState<string | null>(null)
     const editAnnotation = useModal()
 
     const sxStyles: Record<string, SxProps> = {
@@ -54,7 +54,7 @@ export default function EditActivityModal(props: EditActivityModalProps) {
     function changeActivityTag(e: SelectChangeEvent) {
         const newActivityTag: ActivityTag | null = props.instance.activityTags.find(tag => tag.id === e.target.value) || null
         setActivity(prev => {
-            return { ...prev, tag: newActivityTag,contextTags : []}
+            return { ...prev, tag: newActivityTag, contextTags: [] }
         })
     }
 
@@ -86,17 +86,17 @@ export default function EditActivityModal(props: EditActivityModalProps) {
         props.onClose({}, "backdropClick")
     }
 
-    function handleEditAnnotationClick (annotation : string) {
+    function handleEditAnnotationClick(annotation: string) {
         setSelectedAnnotation(annotation)
         editAnnotation.open()
     }
 
-    function handleEditAnnotationSubmit (annotation : string) {
+    function handleEditAnnotationSubmit(annotation: string) {
         setActivity(prev => {
-            const updatedAnnotations : string[] = [...prev.anotations]
+            const updatedAnnotations: string[] = [...prev.anotations]
             const index = updatedAnnotations.findIndex(el => el === selectedAnnotation)
             updatedAnnotations[index] = annotation
-            return {...prev,anotations : updatedAnnotations}
+            return { ...prev, anotations: updatedAnnotations }
         })
     }
 
@@ -121,7 +121,7 @@ export default function EditActivityModal(props: EditActivityModalProps) {
                 <Box sx={sxStyles["contextTags"]}>
                     <ModalFormSectionLabel label="Sub-actividades" />
                     <TagCount
-                    search
+                        search
                         tags={activity.tag ? activity.tag.contextTags : []}
                         onTagClick={handleContextTagClick}
                         highlight={activity.contextTags}
@@ -145,10 +145,10 @@ export default function EditActivityModal(props: EditActivityModalProps) {
                 {
                     (selectedAnnotation && editAnnotation.show) &&
                     <EditAnnotationModal
-                    open={editAnnotation.show}
-                    onClose={editAnnotation.close}
-                    onSubmit={handleEditAnnotationSubmit}
-                    annotation={selectedAnnotation}
+                        open={editAnnotation.show}
+                        onClose={editAnnotation.close}
+                        onSubmit={handleEditAnnotationSubmit}
+                        annotation={selectedAnnotation}
                     />
                 }
             </Box>

@@ -1,7 +1,7 @@
 import { Box, Button, Card, Container, IconButton, SxProps, Typography } from "@mui/material";
 import { useUserContext } from "../../../../context/userContext";
 import { Activity, ActivityRegister, ActivityRegisterInstance } from "../../../../types/activityRegisterInstance";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Stopwatch, StopwatchRef } from "../../../../components/time/stopwatch";
 import { v4 } from "uuid";
 import useModal from "../../../../hook/useModal";
@@ -18,7 +18,7 @@ import EditActivityRegisterModal from "../../../../components/modals/editActivit
 import { milisToStringedClockHour } from "../../../../utils/logic/timeUtils";
 import { useNavigate, useParams } from "react-router-dom";
 import TagCount from "../../../../components/list/tagCount";
-import { styleTheme } from "../../../../main";
+import { darkTheme, styleTheme } from "../../../../main";
 import { writeActivityRegisterInstances } from "../../../../utils/fs/activityRegisterInstance";
 
 export default function ActivityRegisterEditor() {
@@ -44,6 +44,30 @@ export default function ActivityRegisterEditor() {
         if (!register) return null
         setActivityRegister(register)
     }
+
+    const activitySets = useMemo(() => {
+        if (!activityRegister) return
+        const result: Record<string, Activity[]> = {
+            "default": []
+        }
+        for (const activity of activityRegister.activities) {
+            if (!activity.tag) {
+                result["default"].push(activity)
+                continue
+            }
+            if (result[activity.tag.name]) {
+                result[activity.tag.name].push(activity)
+            } else {
+                result[activity.tag.name] = [activity]
+            }
+        }
+        if (result["default"].length <= 0) {
+            delete result["default"]
+        }
+        return result
+    }, [activityRegister])
+
+    console.log("sets : \n", activitySets)
 
     const sxStyles: Record<string, SxProps> = {
         "container": {
@@ -100,12 +124,11 @@ export default function ActivityRegisterEditor() {
             flexWrap: "wrap",
             gap: 2
         },
-        "activity": {
+        "activitySet": {
             display: "flex",
-            flexDirection: "column",
-            width: 350
+            flexDirection: "column"
         },
-        "activity-head": {
+        "activitySet-head": {
             backgroundColor: "primary.main",
             display: "flex",
             flexDirection: "row",
@@ -114,6 +137,30 @@ export default function ActivityRegisterEditor() {
             paddingRight: 1,
             paddingLeft: 2,
             justifyContent: "space-between"
+
+        },
+        "activity": {
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 2,
+            borderTop: `1px solid ${darkTheme.palette.primary.main}`,
+            height : 80
+        },
+        "activitySet-body": {
+            display: "flex",
+            flexDirection: "column"
+        },
+        "activity-buttons": {
+            backgroundColor: "primary.dark",
+            display: "flex",
+            flexDirection: "row",
+            gap: 2,
+            alignItems: "center",
+            paddingRight: 1,
+            paddingLeft: 2,
+            justifyContent: "space-between",
+            height: "100%"
         },
         "activity-title": {
             color: "primary.contrastText"
@@ -133,12 +180,13 @@ export default function ActivityRegisterEditor() {
             alignItems: "center",
             justifyContent: "center",
             gap: 2,
-            padding: "1em"
+            padding: "1em",
+            height: "100%"
         },
-        "activity-footer": {
-            padding: 1,
+        "activity-tags": {
             minHeight: 60,
-            maxHeight: 300
+            maxHeight: 80,
+            width: 300
         }
     }
 
@@ -277,10 +325,6 @@ export default function ActivityRegisterEditor() {
         loadData()
     }, [userContext])
 
-    useEffect(() => {
-
-    }, [])
-
     if (!activityRegister || !instance) {
         return <Button onClick={() => navigate(-1)}>Volver</Button>
     }
@@ -304,47 +348,58 @@ export default function ActivityRegisterEditor() {
                         <TextButton startIcon={<Add />} onClick={addActivity}>Agregar actividad</TextButton>
                     </Box>
                     <Box sx={sxStyles["activities-box-body"]}>
-                        {activityRegister.activities.map((activity, index) => (
-                            <Card sx={sxStyles["activity"]} elevation={4} key={index}>
-                                <Box sx={sxStyles["activity-head"]}>
-                                    <Typography sx={sxStyles["activity-title"]}>
-                                        {activity.tag ? activity.tag.name : "Default"}
-                                    </Typography>
-                                    <Box sx={sxStyles["activity-panel"]}>
-                                        <IconButton
-                                            sx={sxStyles["activity-icon"]}
-                                            onClick={() => selectActivity(activity)}
-                                        ><Edit /></IconButton>
-                                        <IconButton
-                                            sx={sxStyles["activity-icon"]}
-                                            onClick={() => {
-                                                deleteActivity.open()
-                                                setSelectedActivity(activity)
-                                            }}><Delete /></IconButton>
+                        {activitySets &&
+                            Object.keys(activitySets).map((activityKey, setIndex) => (
+                                <Card key={setIndex} sx={sxStyles["activitySe"]}>
+                                    <Box sx={sxStyles["activitySet-head"]}>
+                                        <Typography sx={sxStyles["activity-title"]}>
+                                            {activityKey}
+                                        </Typography>
                                     </Box>
-                                </Box>
-                                <Box sx={sxStyles["activity-body"]}>
+                                    <Box sx={sxStyles["activitySet-body"]}>{
+                                        activitySets[activityKey].map((activity, activityIndex) => (
+                                            <Card sx={sxStyles["activity"]} elevation={4} key={activityIndex}>
+                                                <Box sx={sxStyles["activity-body"]}>
+                                                    <Box sx={sxStyles["activity-tags"]}>
+                                                        {
+                                                            activity.contextTags.length > 0 ?
+                                                                <TagCount
+                                                                    tags={activity.contextTags}
+                                                                />
+                                                                :
+                                                                <Typography textAlign="center" variant="subtitle2">No se han seleccionado tags</Typography>
+                                                        }
+                                                    </Box>
+                                                    <Stopwatch
+                                                        ref={(ref: StopwatchRef) => {
+                                                            stopWatchRefs.current[activity.id] = ref
+                                                        }}
+                                                        startTime={activity.timeMilis}
+                                                    />
+                                                </Box>
+                                                <Box sx={sxStyles["activity-buttons"]}>
+                                                    <IconButton
+                                                        sx={sxStyles["activity-icon"]}
+                                                        onClick={() => selectActivity(activity)}
+                                                    ><Edit /></IconButton>
+                                                    <IconButton
+                                                        sx={sxStyles["activity-icon"]}
+                                                        onClick={() => {
+                                                            deleteActivity.open()
+                                                            setSelectedActivity(activity)
+                                                        }}><Delete /></IconButton>
 
-                                    <Stopwatch
-                                        ref={(ref: StopwatchRef) => {
-                                            stopWatchRefs.current[activity.id] = ref
-                                        }}
-                                        startTime={activity.timeMilis}
-                                    />
+                                                </Box>
+                                            </Card>
 
-                                </Box>
-                                <Box sx={sxStyles["activity-footer"]}>
-                                    {
-                                        activity.contextTags.length > 0 ?
-                                            <TagCount
-                                                tags={activity.contextTags}
-                                            />
-                                            :
-                                            <Typography textAlign="center" variant="subtitle2">No se han seleccionado tags</Typography>
+                                        ))
                                     }
-                                </Box>
-                            </Card>
-                        ))}
+                                    </Box>
+
+                                </Card>
+                            ))
+                        }
+
                     </Box>
                 </Box>
                 {

@@ -10,7 +10,7 @@ interface StopwatchProps {
 
 export interface StopwatchRef {
   getCurrentTime: () => number
-  stop : () => void
+  stop: () => void
 }
 
 export const Stopwatch = forwardRef<StopwatchRef, StopwatchProps>((props, ref) => {
@@ -23,17 +23,16 @@ export const Stopwatch = forwardRef<StopwatchRef, StopwatchProps>((props, ref) =
   useImperativeHandle(ref as Ref<StopwatchRef>, () => {
     return {
       getCurrentTime: () => time,
-      stop : () => setRunning(false)
+      stop: () => setRunning(false)
     }
   }, [time])
 
   const sxStyles: Record<string, SxProps> = {
     "container": {
       display: "flex",
-      flexDirection: "column",
+      flexDirection: "row",
       gap: 2,
-      alignItems: "center",
-      maxWidth: 300
+      alignItems: "center"
     },
     "time-box": {
 
@@ -92,16 +91,15 @@ export const Stopwatch = forwardRef<StopwatchRef, StopwatchProps>((props, ref) =
         <Typography sx={sxStyles["time-text"]} component={"span"}>.{Math.floor((time / 100) % 10)}</Typography>
       </Box>
       <Box sx={sxStyles["panel-box"]}>
-        <IconButton onClick={restart}><RestartAlt /></IconButton>
+        <IconButton onClick={() => { editStopWatch.open() }} >
+          <AccessAlarm />
+        </IconButton>
         {
           running ?
             <IconButton onClick={() => setRunning(false)}><Pause /></IconButton> :
             <IconButton onClick={() => setRunning(true)}><PlayArrow /></IconButton>
         }
-
-        <IconButton onClick={() => { editStopWatch.open() }} >
-          <AccessAlarm />
-        </IconButton>
+        <IconButton onClick={restart}><RestartAlt /></IconButton>
       </Box>
       {
         editStopWatch.show &&
