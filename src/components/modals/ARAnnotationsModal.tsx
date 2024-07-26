@@ -1,16 +1,25 @@
 import { AppBar, Box, Card, IconButton, Modal, SxProps, Toolbar } from "@mui/material"
 import modalStyles from "./modalStyles"
-import { Activity } from "../../types/activityRegisterInstance"
+import { Activity, ActivityRegisterInstance, ActivityTag } from "../../types/activityRegisterInstance"
 import AnnotationCount from "../list/annotationCount"
 import ModalFormSectionLabel from "../text/modalFormSectionLabel"
 import { Close } from "@mui/icons-material"
+import { useMemo } from "react"
 interface ARannotationsModalProps {
     activities: Activity[]
+    instance : ActivityRegisterInstance
     open: boolean
     onClose: ((event: {}, reason: "backdropClick" | "escapeKeyDown") => void)
 }
 
 export default function ARAnnotationsModal(props: ARannotationsModalProps) {
+    const activityTags = useMemo(()=>{
+        const obj : Record<string,ActivityTag> = {}
+        props.instance.activityTags.forEach(tag => {
+            obj[tag.id] = tag
+        })
+        return obj
+    },[props.activities])
     const sxStyles: Record<string, SxProps> = {
         "appBar" : {
             height : 50,
@@ -50,7 +59,7 @@ export default function ARAnnotationsModal(props: ARannotationsModalProps) {
                 <Box sx={sxStyles["content"]}>
                     {props.activities.map((activity, index) => (
                         <Box sx={sxStyles["activity"]} key={index}>
-                            <ModalFormSectionLabel label={activity.tag ? activity.tag.name : "Default"} />
+                            <ModalFormSectionLabel label={activity.tag_id && activityTags[activity.tag_id] ? activityTags[activity.tag_id].name : "Default"} />
                             {
                                 activity.anotations.length > 0 ?
                                     <AnnotationCount

@@ -25,7 +25,7 @@ export interface ActivityRegister {
 
 export interface Activity {
     id : string
-    tag: ActivityTag | null,
+    tag_id: string | null,
     anotations: string[]
     contextTags: ContextTag[]
     time: string

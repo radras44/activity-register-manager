@@ -1,6 +1,6 @@
 import { Box, Button, Card, Container, IconButton, SxProps, Typography } from "@mui/material";
 import { useUserContext } from "../../../../context/userContext";
-import { Activity, ActivityRegister, ActivityRegisterInstance } from "../../../../types/activityRegisterInstance";
+import { Activity, ActivityRegister, ActivityRegisterInstance, ActivityTag } from "../../../../types/activityRegisterInstance";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Stopwatch, StopwatchRef } from "../../../../components/time/stopwatch";
 import { v4 } from "uuid";
@@ -45,29 +45,38 @@ export default function ActivityRegisterEditor() {
         setActivityRegister(register)
     }
 
+    const activityTags = useMemo(()=>{
+        if(!instance) return null
+        const obj : Record<string,ActivityTag> = {}
+        instance.activityTags.forEach(tag => {
+            obj[tag.id] = tag
+        })
+        return obj
+    },[instance])
+
     const activitySets = useMemo(() => {
-        if (!activityRegister) return
+        if (!activityRegister || !activityTags) return
         const result: Record<string, Activity[]> = {
             "default": []
         }
         for (const activity of activityRegister.activities) {
-            if (!activity.tag) {
+            if (!activity.tag_id) {
                 result["default"].push(activity)
                 continue
             }
-            if (result[activity.tag.name]) {
-                result[activity.tag.name].push(activity)
+            if (activityTags[activity.tag_id] && result[activityTags[activity.tag_id].name]) {
+                result[activityTags[activity.tag_id].name].push(activity)
             } else {
-                result[activity.tag.name] = [activity]
+                result[activityTags[activity.tag_id].name] = [activity]
             }
         }
         if (result["default"].length <= 0) {
             delete result["default"]
         }
+        console.log("recalculando sets desde:\n",activityRegister,"\n result: \n",result)
         return result
     }, [activityRegister])
 
-    console.log("sets : \n", activitySets)
 
     const sxStyles: Record<string, SxProps> = {
         "container": {
@@ -292,7 +301,7 @@ export default function ActivityRegisterEditor() {
     function addActivity() {
         const defaultActivity: Activity = {
             id: v4(),
-            tag: null,
+            tag_id: null,
             anotations: [],
             contextTags: [],
             time: "00:00:00.0",
@@ -349,16 +358,16 @@ export default function ActivityRegisterEditor() {
                     </Box>
                     <Box sx={sxStyles["activities-box-body"]}>
                         {activitySets &&
-                            Object.keys(activitySets).map((activityKey, setIndex) => (
-                                <Card key={setIndex} sx={sxStyles["activitySe"]}>
+                            Object.keys(activitySets).map((activityKey) => (
+                                <Card key={activityKey} sx={sxStyles["activitySe"]}>
                                     <Box sx={sxStyles["activitySet-head"]}>
                                         <Typography sx={sxStyles["activity-title"]}>
                                             {activityKey}
                                         </Typography>
                                     </Box>
                                     <Box sx={sxStyles["activitySet-body"]}>{
-                                        activitySets[activityKey].map((activity, activityIndex) => (
-                                            <Card sx={sxStyles["activity"]} elevation={4} key={activityIndex}>
+                                        activitySets[activityKey].map((activity) => (
+                                            <Card key={activity.id} sx={sxStyles["activity"]} elevation={4}>
                                                 <Box sx={sxStyles["activity-body"]}>
                                                     <Box sx={sxStyles["activity-tags"]}>
                                                         {

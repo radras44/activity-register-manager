@@ -14,6 +14,7 @@ export interface StopwatchRef {
 }
 
 export const Stopwatch = forwardRef<StopwatchRef, StopwatchProps>((props, ref) => {
+  console.log("llegando:",props.startTime)
   const [time, setTime] = useState<number>(props.startTime ? props.startTime : 0)
   const [running, setRunning] = useState<boolean>(false)
   const requestAnimationFrameRef = useRef<number | null>(null)

@@ -8,6 +8,7 @@ export interface UserContextState {
     profile: {
         username: string
     }
+    currentInstnace : ActivityRegisterInstance | null
 }
 
 export interface UserContextReturn {
@@ -19,7 +20,8 @@ const userContextInitialState: UserContextState = {
     instances: [],
     profile: {
         username: "default"
-    }
+    },
+    currentInstnace : null
 }
 
 const UserContext = createContext<UserContextReturn>({
@@ -30,6 +32,7 @@ const UserContext = createContext<UserContextReturn>({
 export function UserProvider(props: { children: React.ReactNode }) {
     const [userInfoLoaded,setUserInfoLoaded] = useState<boolean>(false)
     const [state, dispatch] = useReducer(userContextReducer, userContextInitialState)
+
     async function checkInstances() {
         const existentFile = await existsActivityRegisterInstances(state.profile.username)
         if (!existentFile) {

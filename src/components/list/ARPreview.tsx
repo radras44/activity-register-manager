@@ -1,19 +1,28 @@
 import { Box, IconButton, SxProps, Typography } from "@mui/material"
 import { formatDate } from "../../utils/logic/dateUtils"
-import { ActivityRegister } from "../../types/activityRegisterInstance"
+import { ActivityRegister, ActivityRegisterInstance, ActivityTag } from "../../types/activityRegisterInstance"
 import { Edit, StickyNote2 } from "@mui/icons-material"
 import useModal from "../../hook/useModal"
 import ARAnnotationsModal from "../modals/ARAnnotationsModal"
 import { styleTheme } from "../../main"
 import {  milisToStringedClockHour, sumActivityRegisterTimes } from "../../utils/logic/timeUtils"
+import { useMemo } from "react"
 
 interface ARPreviewProps {
     activityRegister: ActivityRegister
     onEditClick: () => void
+    instance : ActivityRegisterInstance
 }
 
 export default function ARPreview(props: ARPreviewProps) {
     const seeAnnotations = useModal()
+    const activityTags = useMemo(()=>{
+        const obj : Record<string,ActivityTag> = {}
+        props.instance.activityTags.forEach(tag => {
+            obj[tag.id] = tag
+        })
+        return obj
+    },[props.instance])
     const sxStyles: Record<string, SxProps> = {
         "container": {
             maxWidth: 650,
@@ -79,7 +88,9 @@ export default function ARPreview(props: ARPreviewProps) {
                     </Box>
                     {props.activityRegister.activities.map((activity, index) => (
                         <Box sx={sxStyles["otherData-list-item"]} key={index}>
-                            <Typography variant="subtitle2" component={"span"}>{activity.tag ? activity.tag.name : "Default"}</Typography>
+                            <Typography variant="subtitle2" component={"span"}>{
+                            activity.tag_id && activityTags[activity.tag_id] ? activityTags[activity.tag_id].name : "Default"
+                            }</Typography>
                             <Typography variant="subtitle2" component={"span"}>{activity.time}</Typography>
                         </Box>
                     ))}
@@ -108,6 +119,7 @@ export default function ARPreview(props: ARPreviewProps) {
                     open={seeAnnotations.show}
                     onClose={seeAnnotations.close}
                     activities={props.activityRegister.activities}
+                    instance={props.instance}
                 />
             }
         </Box>

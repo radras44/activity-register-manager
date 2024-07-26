@@ -69,6 +69,7 @@ export default function ActivityRegisterView(props: ActivityRegisterViewProps) {
                         onEditClick={()=>{
                             navigate(`/instance/activityRegister/${props.instance.id}/${register.id}`)
                         }}
+                        instance={props.instance}
                         />
                     </Box>
                 ))}

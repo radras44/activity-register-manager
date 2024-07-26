@@ -1,7 +1,7 @@
 import { Box, Button, MenuItem, Modal, Select, SelectChangeEvent, SxProps } from "@mui/material"
 import { Activity, ActivityRegisterInstance, ActivityTag, ContextTag } from "../../types/activityRegisterInstance"
 import modalStyles from "./modalStyles"
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import TagCount from "../list/tagCount"
 import AnnotationCount from "../list/annotationCount"
 import AddAnnotationInput from "../inputs/addAnnotationInput"
@@ -20,7 +20,12 @@ interface EditActivityModalProps {
 export default function EditActivityModal(props: EditActivityModalProps) {
     const [activity, setActivity] = useState<Activity>(props.activity)
     const [selectedAnnotation, setSelectedAnnotation] = useState<string | null>(null)
+    console.log(activity)
     const editAnnotation = useModal()
+
+    const activityTag = useMemo(()=>{
+        return props.instance.activityTags.find(tag => tag.id == activity.tag_id) || null
+    },[activity])
 
     const sxStyles: Record<string, SxProps> = {
         "container": {
@@ -54,7 +59,7 @@ export default function EditActivityModal(props: EditActivityModalProps) {
     function changeActivityTag(e: SelectChangeEvent) {
         const newActivityTag: ActivityTag | null = props.instance.activityTags.find(tag => tag.id === e.target.value) || null
         setActivity(prev => {
-            return { ...prev, tag: newActivityTag, contextTags: [] }
+            return { ...prev, tag_id: newActivityTag ? newActivityTag.id : null, contextTags: []}
         })
     }
 
@@ -107,7 +112,7 @@ export default function EditActivityModal(props: EditActivityModalProps) {
                     <ModalFormSectionLabel label="Actividad" />
                     <Select
                         onChange={changeActivityTag}
-                        value={activity.tag ? activity.tag.id : "default"}
+                        value={activityTag ? activityTag.id : "default"}
                     >
                         {props.instance.activityTags.map((tag, index) => (
                             <MenuItem
@@ -122,7 +127,7 @@ export default function EditActivityModal(props: EditActivityModalProps) {
                     <ModalFormSectionLabel label="Sub-actividades" />
                     <TagCount
                         search
-                        tags={activity.tag ? activity.tag.contextTags : []}
+                        tags={activityTag ? activityTag.contextTags : []}
                         onTagClick={handleContextTagClick}
                         highlight={activity.contextTags}
                     />

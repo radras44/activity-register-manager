@@ -6,11 +6,15 @@ export type UserContextReducerAction =
 {type : "UPDATE_INSTANCES",payload : {instances : ActivityRegisterInstance[]}} |
 {type : "UPDATE_INSTANCE",payload : {instance : ActivityRegisterInstance}} |
 {type : "UPDATE_ACTIVITY_TAG",payload : {instance : ActivityRegisterInstance,activityTag : ActivityTag}} |
-{type : "UPDATE_ACTIVITY_REGISTER",payload : {instance : ActivityRegisterInstance,register : ActivityRegister}}
+{type : "UPDATE_ACTIVITY_REGISTER",payload : {instance : ActivityRegisterInstance,register : ActivityRegister}} | 
+{type : "SET_CURRENT_INSTANCE",payload : {instance : ActivityRegisterInstance}}
 
 export function userContextReducer (state : UserContextState,action : UserContextReducerAction) : UserContextState {
     const {type,payload} = action
     switch(type){
+        case "SET_CURRENT_INSTANCE" : {
+            return {...state,currentInstnace : payload.instance}
+        }
         case "UPDATE_INSTANCES" : {
             return {...state,instances : payload.instances}
         }
